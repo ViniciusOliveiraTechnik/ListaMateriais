@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+
+            color: #fff;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Montserrat", serif;
+            font-style: normal;
+
+            background-image: url("automacao_lista_materiais/app_materiais/static/img/error-background.jpg");
+            background-size: cover;
+            backdrop-filter: blur(5px);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+
+            margin-bottom: 70px;
+        }
+
+        img {
+            width: 300px;
+            height: 300px;
+
+            opacity: 60%;
+        }
+
+        p {
+            font-size: 1.8rem;
+            font-weight: 400;
+        }
+
+        .opacity-background {
+            background-color: #000;
+            opacity: 60%;
+
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        }
+
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-wrap: wrap;
+
+            padding: 15px;
+            gap: 20px;
+        }
+
+        button[type="submit"] {
+            border: 1px solid #fff;
+            border-radius: 8px;
+
+            background-color: transparent;
+            backdrop-filter: blur(15px);
+
+            width: 300px;
+            height: 70px;
+            padding: 20px;
+            margin-top: 70px;
+            
+            font-size: 1.4rem;
+            font-weight: 300;
+
+            cursor: pointer;
+
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #ffffff67;
+            color: #000;
+        }
+
+    </style>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="opacity-background">
+        <div class="error-container">
+
+            <h1>ALGO DE ERRADO</h1>
+            <img src="automacao_lista_materiais/app_materiais/static/img/warning.png" alt="">
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum, nihil. Minima ipsa enim odio veritatis at cupiditate vel est quibusdam consequuntur facere, iusto quaerat, accusamus quos iure dolore minus voluptatem.</p>
+    
+            <form action="">
+                <button type="submit">Voltar ao formulário</button>
+            </form>
+    
+        </div>
+    </div>
+</body>
+</html>
