@@ -6,6 +6,7 @@ from openpyxl.styles.borders import Border, Side
 # Libs variadas
 from math import ceil
 import pandas as pd
+from math import ceil
 
 # Classe de estilos para o Excel
 class Styles:
@@ -20,7 +21,8 @@ class Styles:
             top=Side(style='thin')
         ) # Borda padrão
         self.standardFont = Font(name='Arial', size=8) # Fonte padrão
-        self.centerLeftFont = Alignment(vertical='center', horizontal='left', wrap_text=True) # Fonte centralizada ao meio e esquerda
+        self.centerLeftAlignment = Alignment(vertical='center', horizontal='left', wrap_text=True) # Fonte centralizada ao meio e esquerda
+        self.topRigthAlignment = Alignment(vertical='top', horizontal='right', wrap_text=True) # Alinhamento topo e direita
 
     # Método que aplica borda
     def apply_border(self, start, end, work_sheet):
@@ -37,8 +39,8 @@ class Styles:
                 
                 # Retorna erro inesperado
                 except Exception as err:
-                    return {'status': False, 'error': f'Erro ao aplicar estilo de borda: "{str(err)}"'}
-                
+                    return {'status': False, 'error': f'Erro ao aplicar estilo de borda: "{str(err)}"'}        
+
 # Classe para o tratamento dos parafusos
 class Screws:
     def __init__(self):
@@ -102,6 +104,21 @@ class Screws:
 class ExcelExtract:
     def __init__(self):
         pass
+    
+    # Método para formatar o valor do Fixed Length
+    def ceil_format(self, value: float, categorie: str = 'm', extra_percent: float = 0):
+
+        # Define value como new_value
+        new_value = float(value)
+
+        # Verifica se a categioria é metro
+        if categorie == 'm':
+            new_value /= 1000 # Altera a escala de centímetro para metro
+        
+        # Adiciona o valor extra de percentual
+        new_value = ceil(new_value + (new_value * extra_percent))
+
+        return float(new_value) # Retorna o valor em formato de float
     
     # Método para concatenar diversos DataFrames
     def concat(self, *args):

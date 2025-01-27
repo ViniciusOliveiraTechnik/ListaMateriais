@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set "VIRTUAL_ENV=C:\Users\vimol\Technik\All Technik - Documentos\07. Aplicativos\03. Final - Stage\automacao-lista-materiais\venv"
+set "VIRTUAL_ENV=C:\Users\vimol\Technik\Technik Digital - Documentos\Aplicacoes Technik\automacao-lista-materiais\venv"
 
 if not defined PROMPT set PROMPT=$P$G
 

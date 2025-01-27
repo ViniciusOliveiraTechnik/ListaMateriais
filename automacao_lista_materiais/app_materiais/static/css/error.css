@@ -66,6 +66,8 @@ form {
 
     padding: 15px;
     gap: 20px;
+
+    max-width: 800px;
 }
 
 button[type="submit"] {

@@ -1,0 +1,66 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/success.css' %}">
+    <title>Document</title>
+</head>
+<body>
+    {{ data|json_script:"table-data" }}
+
+    <div class="input-container">
+        <input type="text" name="file-name" id="file-name" placeholder="Nome do arquivo" value="{{ filename }}" required>
+    </div>
+
+    <!-- Contêiner da tabela -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Descrição</th>
+                    <th>Spec</th>
+                    <th>Tamanho</th>
+                    <th>Quantidade Necessária</th>
+                    <th>Unidade</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in data %}
+                <tr>
+                    <td>{{ item.description }}</td>
+                    <td>{{ item.spec }}</td>
+                    <td>{{ item.size }}</td>
+                    <td>{{ item.length }}</td>
+                    <td>{{ item.categorie }}</td>
+                    <td>
+                        <a href="#" class="bin-btn">
+                            <img src="{% static 'img/bin.png' %}" alt="Excluir">
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="buttom-container">
+        <form action="" method="post">
+            {% csrf_token %}
+
+            <form action="{% url 'upload_files' %}" method="get">
+                {% csrf_token %}
+
+                <button class="btn btn-secondary">Voltar formulário</button>
+            </form>
+
+            <button id="download-btn" type="submit" class="btn btn-primary">Baixar Planilha</button>
+        </form>
+    </div>
+    
+    <script src="{% static 'js/success.js' %}"></script>
+</body>
+</html>

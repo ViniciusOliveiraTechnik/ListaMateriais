@@ -1,24 +1,61 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/upload_files.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <title>Formulário</title>
 </head>
 <body>
-    <h1>Upload de Arquivo Excel</h1>
 
-    {% if error %}
-        <p style="color: red;" >{{ error }}</p>
-    {% endif %}
-
-    <form action="{% url 'upload_files' %}" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        text
-        <label for="files">Escolha um arquivo</label>
-        <input type="file" name="files" id="files" required multiple>
-        <button type="submit">Enviar</button>
-    </form>
-
+    <div class="main-container">
+        <div class="info-container">
+            <h1>Lista de Materias</h1>
+            <hr>
+            <p>Preencha os campos para formatar seus dados</p>
+        </div>
+    
+        <div class="form-container">
+            <h2>Formulário</h2>
+        
+            <form action="{% url 'upload_files' %}" method="post" enctype="multipart/form-data" autocomplete="off">
+                {% csrf_token %}
+        
+                <input type="file" name="files" id="files" multiple required>
+                <label for="files" class="upload_files">
+                    <img src="{% static 'img/upload.png' %}" alt="" width="35">
+                    Selecionar arquivos
+                </label>
+        
+                <div class="files-container">
+                    <ul class="files-list"></ul>
+                </div>
+        
+                <div class="percentual-container">
+                    <label for="percentual">Percentual:</label>
+                    <input type="range" name="percentual" id="percentual" max="100" min="0" value="0" step="1">
+                    <span class="percentual-value" id="percentual-value" aria-live="polite">0%</span>
+                </div>
+                
+                <div class="input-container">
+                    <label for="file-name">Nome do Arquivo:</label>
+                    <input type="text" name="file-name" id="file-name" placeholder="Digite o nome do arquivo" required>
+                </div>
+                
+                <div class="button-container">
+                    <button id="reset-btn" type="reset" class="btn-clear" aria-label="Limpar formulário">Limpar</button>
+                    <button type="submit" class="btn-execute" aria-label="Enviar formulário">Executar</button>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+    
+    <script src="{% static 'js/upload_files.js' %}"></script>
 </body>
 </html>
