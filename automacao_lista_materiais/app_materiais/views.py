@@ -35,6 +35,11 @@ def download_wb(request):
                 ws.merge_cells(f'A{row_index}:L{row_index}')
                 ws[f'A{row_index}'] = spec
 
+                ws[f'A{row_index}'].font = style.title_font
+                ws[f'A{row_index}'].alignment = style.center_align
+
+                ws.row_dimensions[row_index].height = 35
+
                 for row in data:      
                     if row['spec'] == spec:
 

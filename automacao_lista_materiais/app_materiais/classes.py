@@ -12,17 +12,17 @@ from math import ceil
 class Styles:
     def __init__(self):
         
-        self.titleFont = Font(name='Arial', bold=True, size=8) # Font para titúlos
-        self.centerAlignment = Alignment(vertical='center', horizontal='center') # Alinhamento no meio
-        self.standardBorder = Border(
+        self.title_font = Font(name='Arial', bold=True, size=8) # Font para titúlos
+        self.center_align = Alignment(vertical='center', horizontal='center') # Alinhamento no meio
+        self.standard_border = Border(
             left=Side(style='thin'),
             right=Side(style='thin'),
             bottom=Side(style='thin'),
             top=Side(style='thin')
         ) # Borda padrão
-        self.standardFont = Font(name='Arial', size=8) # Fonte padrão
-        self.centerLeftAlignment = Alignment(vertical='center', horizontal='left', wrap_text=True) # Fonte centralizada ao meio e esquerda
-        self.topRigthAlignment = Alignment(vertical='top', horizontal='right', wrap_text=True) # Alinhamento topo e direita
+        self.standard_font = Font(name='Arial', size=8) # Fonte padrão
+        self.center_left_align = Alignment(vertical='center', horizontal='left', wrap_text=True) # Fonte centralizada ao meio e esquerda
+        self.top_rigth_align = Alignment(vertical='top', horizontal='right', wrap_text=True) # Alinhamento topo e direita
 
     # Método que aplica borda
     def apply_border(self, start, end, work_sheet):
