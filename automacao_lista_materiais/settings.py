@@ -17,7 +17,7 @@ SECRET_KEY = 'django-insecure-@kl&%3z6wzqj6uif_)-(c1j2u(d7^iq3!$wwe4l_r2@@i0%znc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['pedroruizti.pythonanywhere.com']
 
 
 # Application definition
@@ -108,6 +108,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
 # Defina o diretório onde os arquivos estáticos serão armazenados após o comando collectstatic
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
