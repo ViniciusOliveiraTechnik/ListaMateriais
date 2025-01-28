@@ -25,37 +25,61 @@ def download_wb(request):
             # Separa as SPECS
             specs = sorted({chave: list({d[chave] for d in data if chave in d}) for chave in {k for d in data for k in d}}.get('spec'))
 
-            row_index = 0
+            # Criando cabeçalho
+            row_index =  style.create_header(ws)
 
+            # Para cada Spec
             for i, spec in enumerate(specs):
-
-                row_index += 1
-                count_index = 0
                 
-                ws.merge_cells(f'A{row_index}:L{row_index}')
-                ws[f'A{row_index}'] = spec
+                # Tentativa de execução do bloco
+                try:
+    
+                    row_index += 1 # Incrementa uma linha para os dados
+                    count_index = 0 # Reinicia a contagem de cada spec
+                    
+                    # Cria uma célula mesclada para adicionar o valor da Spec
+                    ws.merge_cells(f'A{row_index}:L{row_index}')
+                    ws[f'A{row_index}'] = f'SPEC {spec}'
 
-                ws[f'A{row_index}'].font = style.title_font
-                ws[f'A{row_index}'].alignment = style.center_align
+                    # Estiliza a célula
+                    ws[f'A{row_index}'].font = style.title_font
+                    ws[f'A{row_index}'].alignment = style.center_align
 
-                ws.row_dimensions[row_index].height = 35
+                    ws.row_dimensions[row_index].height = 35 # Define o tamanho para 35
 
-                for row in data:      
-                    if row['spec'] == spec:
+                    # Para cada linha da base de dados
+                    for row in data:      
+                        if row['spec'] == spec: # Verfiica se a Spec da linha é o mesmo da atual
 
-                        row_index += 1
-                        count_index +=1 
+                            row_index += 1 # Adiciona mais uma linha ao Excel
+                            count_index += 1 # Adiciona mais uma contagem 
 
-                        ws[f'A{row_index}'] = f'{i+1}.{count_index}'
+                            # Adiciona cada dado presente no dicionário
+                            ws[f'A{row_index}'] = f'{i+1}.{count_index}'
+                            ws[f'A{row_index}'].alignment = style.center_align
+                            ws[f'A{row_index}'].font = style.standard_font
 
-                        ws.merge_cells(f'B{row_index}:I{row_index}')
-                        ws[f'B{row_index}'] = row['description']
+                            ws.merge_cells(f'B{row_index}:I{row_index}')
+                            ws[f'B{row_index}'] = row['description']
+                            ws[f'B{row_index}'].alignment = style.center_left_align
+                            ws[f'B{row_index}'].font = style.standard_font
 
-                        ws[f'J{row_index}'] = row['size']
+                            ws[f'J{row_index}'] = row['size']
+                            ws[f'J{row_index}'].alignment = style.center_align 
+                            ws[f'J{row_index}'].font = style.standard_font
+                            
+                            ws[f'K{row_index}'] = row['length']
+                            ws[f'K{row_index}'].alignment = style.center_align 
+                            ws[f'K{row_index}'].font = style.standard_font 
 
-                        ws[f'K{row_index}'] = row['length']
+                            ws[f'L{row_index}'] = row['categorie']
+                            ws[f'L{row_index}'].alignment = style.center_align
+                            ws[f'L{row_index}'].font = style.standard_font
 
-                        ws[f'L{row_index}'] = row['categorie']
+                            ws.row_dimensions[row_index].height = 35
+
+                except Exception as err:
+                    return render(request, 'error.html', {'error': f'Erro Inesperado: {str(err)}'})
 
             # Aplica borda nas células
             style.apply_border('A1', f'L{row_index}', ws)
@@ -82,7 +106,7 @@ def download_wb(request):
             return render(request, 'error.html', {'error': f'Erro Inesperado: {str(err)}'})
         
     # Erro de método
-    return render(request, 'error.html', {'error': f'Utilização do método incorreto: {str(response.method)}'})
+    return render(request, 'error.html', {'error': f'Utilização do método incorreto: {str(request.method)}'})
 
 def handle_response(response: dict, request, error_template, data_key='data'):
     """

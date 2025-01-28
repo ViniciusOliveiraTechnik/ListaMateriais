@@ -13,7 +13,9 @@ class Styles:
     def __init__(self):
         
         self.title_font = Font(name='Arial', bold=True, size=8) # Font para titúlos
+        self.title_font_header = Font(name='Arial', bold=True, size=10) # Font para titúlos
         self.center_align = Alignment(vertical='center', horizontal='center') # Alinhamento no meio
+        self.center_wrap_align = Alignment(vertical='center', horizontal='center', wrap_text=True)
         self.standard_border = Border(
             left=Side(style='thin'),
             right=Side(style='thin'),
@@ -21,6 +23,7 @@ class Styles:
             top=Side(style='thin')
         ) # Borda padrão
         self.standard_font = Font(name='Arial', size=8) # Fonte padrão
+        self.standard_font_header = Font(name='Arial', size=10) # Fonte padrão
         self.center_left_align = Alignment(vertical='center', horizontal='left', wrap_text=True) # Fonte centralizada ao meio e esquerda
         self.top_rigth_align = Alignment(vertical='top', horizontal='right', wrap_text=True) # Alinhamento topo e direita
 
@@ -29,18 +32,105 @@ class Styles:
 
         # Aplica um intervalo entre células
         for row in work_sheet[start:end]:
-
             # Para cada uma dentro desse intervalo aplique a borda
             for cell in row:
-                
                 # Tenta aplicar a borda para a célula
                 try:
-                    cell.border = self.standardBorder
+                    cell.border = self.standard_border
                 
                 # Retorna erro inesperado
                 except Exception as err:
                     return {'status': False, 'error': f'Erro ao aplicar estilo de borda: "{str(err)}"'}        
+    
+    # Método para criar o cabeçalho do arquivo
+    def create_header(self, worksheet):
 
+        # Bloco superior esquerdo
+        worksheet.merge_cells('A1:C4')
+        
+        # Bloco Technik
+        worksheet.merge_cells('A5:C8')
+
+        worksheet['A5'] = '=IMAGEM("https://technikgrupo.sharepoint.com/sites/transfer/Logos/Technik.png")' # Adicionando conteúdo de Imagem
+        worksheet['A5'].alignment = self.center_align  # Alinhamento ao centro
+
+        # Legenda Technik
+        worksheet.merge_cells('A9:C10')
+
+        worksheet['A9'] = 'CENTRO DE ENGENHARIA TECHNIK'
+        worksheet['A9'].alignment = self.center_wrap_align # Alinhamento ao centro com quebra de linha
+        worksheet['A9'].font = self.standard_font # Fonte padrão de texto
+
+        # Título superior     
+        worksheet.merge_cells('D1:G2')
+
+        worksheet['D1'] = 'LISTA DE MATERIAIS'
+        worksheet['D1'].alignment = self.center_align
+        worksheet['D1'].font = self.title_font_header
+
+        # Informações do cliente
+        
+        # Cliente
+        worksheet['D3'] = 'CLIENTE'
+        worksheet['D3'].alignment =  self.center_left_align
+        worksheet['D3'].font = self.standard_font
+
+        worksheet['D4'] = 'Client'
+        worksheet['D4'].alignment =  self.center_left_align
+        worksheet['D4'].font = self.standard_font
+
+        worksheet.merge_cells('E3:L4')
+
+        # Unidade
+        worksheet['D5'] = 'UNIDADE'
+        worksheet['D5'].alignment =  self.center_left_align
+        worksheet['D5'].font = self.standard_font
+
+        worksheet['D6'] = 'Plant'
+        worksheet['D6'].alignment =  self.center_left_align
+        worksheet['D6'].font = self.standard_font
+
+        worksheet.merge_cells('E5:L6')
+
+        # Área
+        worksheet['D7'] = 'ÁREA'
+        worksheet['D7'].alignment =  self.center_left_align
+        worksheet['D7'].font = self.standard_font
+
+        worksheet['D8'] = 'Area'
+        worksheet['D8'].alignment =  self.center_left_align
+        worksheet['D8'].font = self.standard_font
+
+        worksheet.merge_cells('E7:L8')
+
+        # Título
+        worksheet['D9'] =  'Título'
+        worksheet['D9'].alignment =  self.center_left_align
+        worksheet['D9'].font = self.standard_font
+
+        worksheet['D10'] =  'Title'
+        worksheet['D10'].alignment =  self.center_left_align
+        worksheet['D10'].font = self.standard_font
+
+        worksheet.merge_cells('E9:l10')
+
+        worksheet['E9'] = 'LISTA DE MATERIAIS DE TUBULAÇÃO'
+        worksheet['E9'].alignment =  self.center_align
+        worksheet['E9'].font = self.standard_font_header
+
+        # Número do fluxograma
+        worksheet.merge_cells('H1:H2')
+
+        worksheet['H1'] =  'Nº'  # Label descritiva
+        worksheet['H1'].alignment =  self.top_rigth_align
+        worksheet['H1'].font = self.standard_font
+
+        worksheet.merge_cells('I1:L2') # Campo para inserir valores
+                
+        row_index = 10
+
+        return row_index
+    
 # Classe para o tratamento dos parafusos
 class Screws:
     def __init__(self):

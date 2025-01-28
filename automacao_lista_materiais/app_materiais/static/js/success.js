@@ -87,5 +87,5 @@ function getCookie(name) {
         .split('; ')
         .find(row => row.startsWith(name))
         ?.split('=')[1];
-    return cookieValue || '';
+    return cookieValue || ''; 
 }
