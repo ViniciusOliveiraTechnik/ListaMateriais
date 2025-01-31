@@ -4,7 +4,6 @@ from openpyxl.styles import Alignment, Font
 from openpyxl.styles.borders import Border, Side
 
 # Libs variadas
-from math import ceil
 import pandas as pd
 from math import ceil
 
@@ -152,15 +151,12 @@ class Screws:
 
     # Método para obter todos os parafusos do dataframe
     def get_screws(self, DataFrame):
-
         # Tentativa de pegar os parafusos
         try:
-
             # Filtra dataframe para obter apenas a descrição que seja igual a Flange
             screwsDF = DataFrame[DataFrame['Long Description (Size)'].str.startswith('FLANGE')][['Long Description (Size)', 'Size', 'Spec', 'Fixed Length']]
 
             # Filtra através do banco de dados
-
             for column in self.baseDF.columns:
 
                 # Cria um lookup em todas as colunas dos dataframe
@@ -224,7 +220,7 @@ class ExcelExtract:
         # Define o DataFrame geral como a concatenação dos passados
         try:
             mainDF = pd.concat(args, ignore_index=True)
-            return {'status': True, 'data': mainDF} # Retorna dados corretamente
+            return {'status': True, 'data': mainDF.sort_values(by=['Long Description (Size)', 'Size', 'Spec'])} # Retorna dados corretamente
         
         # Tratamento de erros
         except Exception as err:
@@ -370,7 +366,7 @@ class ExcelExtract:
 
         # Tentativa de filtrar equipamentos
         try:
-            mainDF = mainDF[~mainDF['Long Description (Size)'].str.startswith('TUBO')] # Filtra todos os valores exceto tubulações
+            mainDF = mainDF[~mainDF['Long Description (Size)'].str.upper().str.contains(r'^TUBO|PIPE', regex=True)] # Filtra todos os valores exceto tubulações
         
             response = self.count_unique(mainDF) # Resposta do método de agrupamento por contagem única
 
