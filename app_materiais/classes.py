@@ -150,41 +150,39 @@ class Screws:
         })
 
     # Método para obter todos os parafusos do dataframe
-    def get_screws(self, DataFrame):
-        # Tentativa de pegar os parafusos
-        try:
-            # Filtra dataframe para obter apenas a descrição que seja igual a Flange
-            screwsDF = DataFrame[DataFrame['Long Description (Size)'].str.startswith('FLANGE')][['Long Description (Size)', 'Size', 'Spec', 'Fixed Length']]
+    # def get_screws(self, DataFrame):
 
-            # Filtra através do banco de dados
-            for column in self.baseDF.columns:
+        #
 
-                # Cria um lookup em todas as colunas dos dataframe
-                screwsDF[column] = screwsDF['Size'].map(    
-                    lambda x: self.baseDF[self.baseDF['diametro_nominal'] == str(x)][column].iloc[0]
-                )
+        # # Tentativa de pegar os parafusos
+        # try:
+        #     # Filtra dataframe para obter apenas a descrição que seja igual a Flange
+        #     screwsDF = DataFrame[DataFrame['Long Description (Family)'].str.startswith('FLANGE')][['Long Description (Family)', 'Size', 'Spec', 'Fixed Length']]
 
-            # Atualizar descrições e tamanhos
-            screwsDF['Long Description (Size)'] = screwsDF.apply(
-                lambda row: f"PARAFUSO {row['parafusos_diametro']} X {row['comprimento']}", axis=1
-            )
+        #     # Filtra através do banco de dados
+        #     for column in self.baseDF.columns:
+        #         # Cria um lookup em todas as colunas dos dataframe
+        #         screwsDF[column] = screwsDF['Size'].map(    
+        #             lambda x: self.baseDF[self.baseDF['diametro_nominal'] == str(x)][column].iloc[0])
 
-            # Multiplica a quantidade de flanges pela quantidade de parafusos
-            screwsDF['Fixed Length'] *= screwsDF['parafusos_quantidade']
+        #     # Atualizar descrições e tamanhos
+        #     screwsDF['Long Description (Family)'] = screwsDF.apply(
+        #         lambda row: f"PARAFUSO {row['parafusos_diametro']} X {row['comprimento']}", axis=1)
+            
+        #     # Multiplica a quantidade de flanges pela quantidade de parafusos
+        #     screwsDF['Fixed Length'] *= screwsDF['parafusos_quantidade']
 
-            # Cria um parafuso
-            screwsDF['Size'] = screwsDF.apply(
-                lambda row: f"{row['parafusos_diametro']}x{row['comprimento']}", axis=1
-            )
+        #     # Cria um parafuso
+        #     screwsDF['Size'] = screwsDF.apply(
+        #         lambda row: f"{row['parafusos_diametro']}x{row['comprimento']}", axis=1)
 
-            # Retorna todos os parafusos
-            return {'status': True, 'data': screwsDF} 
+        #     # Retorna todos os parafusos
+        #     return {'status': True, 'data': screwsDF} 
 
-        except KeyError as err:
-            return {'status': False, 'error': f'KeyError relacinado à "{str(err)}" '}
-        
-        except Exception as err:
-            return {'status': False, 'error': f'Erro Inesperado: {str(err)}'}
+        # except KeyError as err:
+        #     return {'status': False, 'error': f'KeyError relacinado à "{str(err)}" '}
+        # except Exception as err:
+        #     return {'status': False, 'error': f'Erro Inesperado: {str(err)}'}
 
 # Classe para extração de dados do excel
 class ExcelExtract:
@@ -193,7 +191,6 @@ class ExcelExtract:
     
     # Método para formatar o valor do Fixed Length
     def ceil_format(self, value: float, categorie: str = 'm', extra_percent: float = 0):
-
         # Define value como new_value
         new_value = float(value)
 
@@ -220,7 +217,7 @@ class ExcelExtract:
         # Define o DataFrame geral como a concatenação dos passados
         try:
             mainDF = pd.concat(args, ignore_index=True)
-            return {'status': True, 'data': mainDF.sort_values(by=['Long Description (Size)', 'Size', 'Spec'])} # Retorna dados corretamente
+            return {'status': True, 'data': mainDF.sort_values(by=['Long Description (Family)', 'Size', 'Spec'])} # Retorna dados corretamente
         
         # Tratamento de erros
         except Exception as err:
@@ -228,120 +225,97 @@ class ExcelExtract:
             
     # Método para somar valores únicos de cada dataframe
     def sum_unique(self, dataframe):
-
         # Tentativa de executar o programa
         try:
-
             # Agrupa os dados do dataframe que possuem dados semelhantes
-            mainDF = dataframe.groupby(['Long Description (Size)', 'Size', 'Spec'], as_index=False)['Fixed Length'].sum()
+            mainDF = dataframe.groupby(['Long Description (Family)', 'Size', 'Spec'], as_index=False)['Fixed Length'].sum()
             return {'status': True, 'data': mainDF} # Retorna status positivo e dados
 
         # Tratamento de erros
         except ValueError as err:
             return {'status': False, 'error': f'Erro entre os tipos de valores: {str(err)}'}
-        
         except KeyError as err:
             return {'status': False, 'error': f'Erro de chaves da tabela: {str(err)}'}
-
         except Exception as err:
             return {'status': False, 'error': f'Erro Inesperado: {str(err)}'}
         
     # Método para somar valores únicos de cada dataframe
     def count_unique(self, dataframe):
-
         # Tentativa de executar o programa
         try:
-
             # Agrupa os dados do dataframe que possuem dados semelhantes
-            mainDF = dataframe.groupby(['Long Description (Size)', 'Size', 'Spec']).size().reset_index(name='Fixed Length')
-
-            # Cria objeto da classe de parafusos
-            screws = Screws()
-            response = screws.get_screws(mainDF)
-
-            # Verifica se a response é verdadeira
-            if response['status']:
-                screwsDF = response['data'] # Obtem os dados do dicionário
-
-                response = self.sum_unique(screwsDF) # Segunda response de método, para formatar os parafusos
-
-                # Verifica o status de execução é positivo
-                if response['status']:  
-                    screwsDF = response['data'] # Obtem todos os dados do dicionario
-                    mainDF = pd.concat([mainDF, screwsDF], ignore_index=True) # Concatena os dados do mainDF e do screwDF
-
-                    return {'status': True, 'data': mainDF} # Retorna status positivo e dados
-                
-                return {'status': False, 'error': response['error']} # Retorna erro caso algum ocorra
-
-            return {'status': False, 'error': response['error']} # Retorna erro caso algum ocorra
+            mainDF = dataframe.groupby(['Long Description (Family)', 'Size', 'Spec']).size().reset_index(name='Fixed Length')
+            return {'status': True, 'data': mainDF} # Retorna status positivo e dados
         
         # Tratamento de erros
         except ValueError as err:
             return {'status': False, 'error': f'Erro entre os tipos de valores: {str(err)}'}
-        
         except KeyError as err:
             return {'status': False, 'error': f'Erro de chaves da tabela: {str(err)}'}
-
         except Exception as err:
             return {'status': False, 'error': f'Erro Inesperado: {str(err)}'}
 
     # Método para ler todos os arquivos
     def read_all_files(self, files, sheet_name):
-
         # Erro caso os parâmetros não sejam satisfeitos
         if not sheet_name or not files:
-            return {'status': False, 'error': 'Os parâmetros não foram fornecidos'}
+            return {'status': False, 'error': 'Os parâmetros não foram fornecidos para a função "read_all_files"'}
 
         mainDF = pd.DataFrame() # Cria dataframe vazio
 
         # Aplica um for para cada arquivo selecionado
         for file in files:
-            
-            # Tentativa de ler o arquivo com pandas
-            try:
-                tempDF = pd.read_excel(file, sheet_name=sheet_name)
+            try: 
+                tempDF = pd.read_excel(file, sheet_name=sheet_name) # Lê arquivo excel na folha selecionada
                 mainDF = pd.concat([mainDF, tempDF], ignore_index=True) # Concatena o dataframe temporário com o dataframe principal
             
             # Tratamento de erros
             except KeyError as err:
-                return {'status': False, 'error': f'Erro de Chaves: {str(err)}'}
-            
+                return {'status': False, 'error': f'Não foi possível encontrar a planilha desejada: "{str(err)}"'}
             except FileNotFoundError as err:
-                return {'status': False, 'error': f'Não foi possível encontrar o arquivo: {str(err)}'}
-            
+                return {'status': False, 'error': f'Não foi possível encontrar o arquivo: "{str(err)}"'}
             except Exception as err:
-                return {'status': False, 'error': f'Erro Inesperado, solicite o suporte da equipe de TI: {str(err)}'}
+                return {'status': False, 'error': f'Erro Inesperado, solicite o suporte da equipe de TI: "{str(err)}"'}
 
-        # Tentativa de filtragem do dataframe com as colunas especificadas
         try:
-            mainDF = mainDF[['Long Description (Size)', 'Spec', 'Size', 'Fixed Length']]
+            # Filtra o DataFrame para calcular as tubulações
+            mainDF = mainDF[['Long Description (Family)', 'Status', 'Spec', 'Size', 'Fixed Length']]
         
         # Caso Fixed Length não exista dentro desse DataFrame tenta-se outra abordagem
         except KeyError as err:
             try: # Tentativa de criar DataFrame com as colunas especificadas
-                mainDF = mainDF[['Long Description (Size)', 'Spec', 'Size']]
+                mainDF = mainDF[['Long Description (Family)', 'Status', 'Spec', 'Size']]
 
             # Tratamento de erro para todos os casos
             except KeyError as err:
-                return {'status': False, 'error': f'Erro de Chaves: {str(err)}'}
-
+                return {'status': False, 'error': f'Erro ao encontrar as colunas desejadas: "{str(err)}"'}
             except Exception as err:
-                return {'status': False, 'error': f'Erro Inesperado, solicite o suporte da equipe de TI: {str(err)}'}
+                return {'status': False, 'error': f'Erro Inesperado, solicite o suporte da equipe de TI: "{str(err)}"'}
 
-        # Deleta todas as linhas que possuirem valores do tipo NaN
-        mainDF = mainDF.dropna().reset_index(drop=True)
+        # Filtrando o MainDF
+        try:
+            mainDF = mainDF.dropna().reset_index(drop=True) # Deleta todas as linhas que possuirem valores do tipo NaN
+            mainDF = mainDF[mainDF['Status'] == 'New'] # Filtra apenas o status new
 
-        # Aplica a cada SPEC a verificação se ela possui 0 antes de algum valor numérico
-        mainDF['Spec'] = mainDF['Spec'].map(lambda x: str(x).replace('0', '') if str(x).startswith('0') and len(str(x)) > 1 
-        else str(x).upper())
+            mainDF['Spec'] = (
+                mainDF['Spec']
+                .astype(str)
+                .str.upper()
+                .str.replace(r'(^\bSPEC\b|\b0\d+)', '', regex=True)
+                .str.strip()
+                )
+
+
+        except KeyError as err:
+            return {'status': False, 'error': f'Erro ao encontrar colunas: {str(err)}'}
+        except Exception as err:
+            return {'status': False, 'error': f'Erro Inesperado, solicite o suporte da equipe de TI: "{str(err)}"'}
 
         # Verifica se o nome da Sheet é Pipe (tubulação)
         if 'pipe' == str(sheet_name).lower():
-            
-            # Tentativa de agrupar valores únicos
             try:
-                response = self.sum_unique(mainDF) # Resposta de execução do método
+                # Somando valores únicos
+                response = self.sum_unique(mainDF)
 
                 # Verifica se o status é verdadeiro
                 if response['status']:
@@ -357,18 +331,17 @@ class ExcelExtract:
             # Tratamento de erros
             except KeyError as err:
                 return {'status': False, 'error': f'Erro de Chaves: {str(err)}'}
-            
             except ValueError as err:
-                return {'status': False, 'error': f'Erro de Valores: {str(err)}'}
-            
+                return {'status': False, 'error': f'Erro de Valores: {str(err)}'}    
             except Exception as err:
                 return {'status': False, 'error': f'Erro Inesperado, solicite o suporte da equipe de TI: {str(err)}'}
 
-        # Tentativa de filtrar equipamentos
+        # Filtra apenas os equipamentos
         try:
-            mainDF = mainDF[~mainDF['Long Description (Size)'].str.upper().str.contains(r'^TUBO|PIPE', regex=True)] # Filtra todos os valores exceto tubulações
+            mainDF = mainDF[~mainDF['Long Description (Family)'].str.upper().str.contains(r'^(TUBO|PIPE|PARAFUSO|FLANGE)', regex=True)] # Filtra todos os valores exceto tubulações e flanges
         
-            response = self.count_unique(mainDF) # Resposta do método de agrupamento por contagem única
+            # Conta e define valores únicos
+            response = self.count_unique(mainDF)
 
             # Verifica se o status é positivo
             if response['status']:
@@ -383,9 +356,7 @@ class ExcelExtract:
         # Tratamento de erros
         except KeyError as err: 
             return {'status': False, 'error': f'Erro de Chaves: {str(err)}'}
-            
         except ValueError as err:
             return {'status': False, 'error': f'Erro de Valores: {str(err)}'}
-            
         except Exception as err:
             return {'status': False, 'error': f'Erro Inesperado, solicite o suporte da equipe de TI: {str(err)}'}

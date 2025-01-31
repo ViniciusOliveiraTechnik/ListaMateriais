@@ -9,11 +9,11 @@ from .classes import ExcelExtract, Screws, Styles
 
 ex = ExcelExtract()
 style = Styles()
+screws = Screws()
 
 def download_wb(request):
     if request.method == 'POST': # Verifica se o método é POST
         try: # Tenta executar o seguinte bloco:
-
             # Decodificar o corpo do request
             data = json.loads(request.body)
 
@@ -23,17 +23,15 @@ def download_wb(request):
             ws.title = "data"
 
             # Separa as SPECS
-            specs = sorted({chave: list({d[chave] for d in data if chave in d}) for chave in {k for d in data for k in d}}.get('spec'))
+            specs = {chave: list({d[chave] for d in data if chave in d}) for chave in {k for d in data for k in d}}.get('spec')
 
             # Criando cabeçalho
             row_index =  style.create_header(ws)
 
             # Para cada Spec
             for i, spec in enumerate(specs):
-                
                 # Tentativa de execução do bloco
                 try:
-    
                     row_index += 1 # Incrementa uma linha para os dados
                     count_index = 0 # Reinicia a contagem de cada spec
                     
@@ -89,6 +87,7 @@ def download_wb(request):
             wb.save(output)
             output.seek(0)
 
+
             # Configurar resposta
             response = HttpResponse(
                 output,
@@ -101,9 +100,8 @@ def download_wb(request):
         # Tratamento de erros
         except json.JSONDecodeError:
             return render(request, 'error.html', {'error': f'JSON Inválido'})
-
-        except Exception as err:
-            return render(request, 'error.html', {'error': f'Erro Inesperado: {str(err)}'})
+        # except Exception as err:
+        #     return render(request, 'error.html', {'error': f'Erro Inesperado: {str(err)}'})
         
     # Erro de método
     return render(request, 'error.html', {'error': f'Utilização do método incorreto: {str(request.method)}'})
@@ -162,12 +160,23 @@ def upload_files(request):
         if isinstance(equipDF, HttpResponse):
             return equipDF
         
+        # # Flange response
+        # response = ex.read_all_files(files, 'Flange')
+        # flangeDF = handle_response(response, request, 'error.html')
+        # if isinstance(flangeDF, HttpResponse):
+        #     return flangeDF
+        
+        # # Configurando parafusos
+        # screwsDF = screws.get_screws(flangeDF)
+
         # Concatenando DataFrames
         response = ex.concat(pipeDF, equipDF)
         mainDF = handle_response(response, request, 'error.html')
         if isinstance(mainDF, HttpResponse):
             return mainDF
         
+        # Obtendo parafusos
+
         # Obtem o percentual adicional
         extra_percent = request.POST.get('percentual')
         extra_percent = float(extra_percent) / 100
@@ -183,7 +192,7 @@ def upload_files(request):
 
             # Cria um dicionário para cada dado
             data = {
-                'description': row['Long Description (Size)'],
+                'description': row['Long Description (Family)'],
                 'spec': row['Spec'],
                 'size': row['Size'],
                 'length': ex.ceil_format(row['Fixed Length'], row['Categorie'], extra_percent),
@@ -192,7 +201,7 @@ def upload_files(request):
 
             # Adiciona o dado ao contexto que será enviado
             context.append(data)
-
+        
         # Retorne a tela de sucesso
         return render(request, 'success.html', {'data': context, 'filename': file_name})
 
