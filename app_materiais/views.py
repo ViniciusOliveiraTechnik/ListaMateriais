@@ -23,7 +23,7 @@ def download_wb(request):
             ws.title = "data"
 
             # Separa as SPECS
-            specs = {chave: list({d[chave] for d in data if chave in d}) for chave in {k for d in data for k in d}}.get('spec')
+            specs = sorted({chave: list({d[chave] for d in data if chave in d}) for chave in {k for d in data for k in d}}.get('spec'))
 
             # Criando cabeçalho
             row_index =  style.create_header(ws)
@@ -146,64 +146,55 @@ def upload_files(request):
 
     # Verify if request method is POST and files is not none
     if request.method == 'POST' and request.FILES.getlist('files'):
-        files = request.FILES.getlist('files') # Declare files 
-        
-        # Pipe response
-        response = ex.read_all_files(files, 'Pipe')
-        pipeDF = handle_response(response, request, 'error.html')
-        if isinstance(pipeDF, HttpResponse):
-            return pipeDF
-        
-        # Equipment response
-        response = ex.read_all_files(files, 'Piping and Equipment')
-        equipDF = handle_response(response, request, 'error.html')
-        if isinstance(equipDF, HttpResponse):
-            return equipDF
-        
-        # # Flange response
-        # response = ex.read_all_files(files, 'Flange')
-        # flangeDF = handle_response(response, request, 'error.html')
-        # if isinstance(flangeDF, HttpResponse):
-        #     return flangeDF
-        
-        # # Configurando parafusos
-        # screwsDF = screws.get_screws(flangeDF)
+        try:
+            files = request.FILES.getlist('files') # Declare files 
+            
+            # Filtra as colunas de tubulação
+            pipe_df = ex.read_all_files(files, 'Pipe')
+            pipe_df = ex.get_pipe(pipe_df)
+            print(pipe_df)
+            # Filtrando as flanges
+            flanges_df = ex.read_all_files(files, 'Flange')
+            flanges_df = ex.get_flange(flanges_df)
 
-        # Concatenando DataFrames
-        response = ex.concat(pipeDF, equipDF)
-        mainDF = handle_response(response, request, 'error.html')
-        if isinstance(mainDF, HttpResponse):
-            return mainDF
-        
-        # Obtendo parafusos
+            # Filtrando parafusos
+            screws_df = screws.get_screws(flanges_df)
 
-        # Obtem o percentual adicional
-        extra_percent = request.POST.get('percentual')
-        extra_percent = float(extra_percent) / 100
+            # Filtrando os equipamentos
+            equip_df = ex.read_all_files(files, 'Piping and Equipment')
+            equip_df = ex.get_equipment(equip_df)
 
-        # Obtem o nome para o novo arquivo
-        file_name = request.POST.get('file-name')
+            # Concatenando os valores
+            main_df = ex.concat(pipe_df, flanges_df, screws_df, equip_df)
+            # Obtem o percentual adicional
+            extra_percent = request.POST.get('percentual')
+            extra_percent = float(extra_percent) / 100
 
-        # Cria o contexto para armazenar os dados
-        context = []
-        
-        # Aplica a cada linha do DataFrame
-        for _, row in mainDF.iterrows():
+            # Obtem o nome para o novo arquivo
+            file_name = request.POST.get('file-name')
 
-            # Cria um dicionário para cada dado
-            data = {
-                'description': row['Long Description (Family)'],
-                'spec': row['Spec'],
-                'size': row['Size'],
-                'length': ex.ceil_format(row['Fixed Length'], row['Categorie'], extra_percent),
-                'categorie': row['Categorie']
-            }
+            # Cria o contexto para armazenar os dados
+            context = []
+            
+            # Aplica a cada linha do DataFrame
+            for _, row in main_df.iterrows():
 
-            # Adiciona o dado ao contexto que será enviado
-            context.append(data)
-        
-        # Retorne a tela de sucesso
-        return render(request, 'success.html', {'data': context, 'filename': file_name})
+                # Cria um dicionário para cada dado
+                data = {
+                    'description': row['Long Description (Family)'],
+                    'spec': row['Spec'],
+                    'size': row['Size'],
+                    'length': ex.ceil_format(row['Fixed Length'], row['Categorie'], extra_percent),
+                    'categorie': row['Categorie']
+                }
 
+                # Adiciona o dado ao contexto que será enviado
+                context.append(data)
+            
+            # Retorne a tela de sucesso
+            return render(request, 'success.html', {'data': context, 'filename': file_name})
+    
+        except Exception as e:
+            return render(request, 'error.html', {'error': str(e)})
     else:
         return render(request, 'upload_files.html')

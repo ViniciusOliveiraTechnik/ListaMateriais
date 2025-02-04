@@ -135,54 +135,50 @@ class Screws:
     def __init__(self):
 
         # Dataframe utilizado para manipulação dos parafusos
-        self.baseDF= pd.DataFrame({
-        'classe': [150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150],
-        'diametro_nominal': [
-            '1/2"', '3/4"', '1"', '1 1/4"', '1 1/2"', '2"', '2 1/2"', '3"', '4"', '6"', '8"', '10"', '12"', '14"', '16"', '18"', '20"', '24"'
-        ],
-        'parafusos_quantidade': [4, 4, 4, 4, 4, 4, 4, 4, 8, 8, 8, 12, 12, 12, 16, 16, 20, 20],
-        'parafusos_diametro': [
-            '1/2"', '1/2"', '1/2"', '1/2"', '1/2"', '5/8"', '5/8"', '5/8"', '5/8"', '3/4"', '3/4"', '7/8"', '7/8"', '1"', '1"', '1 1/8"', '1 1/8"', '1 1/4"'
-        ],
-        'comprimento': [
-            '2"', '2 1/4"', '2 1/4"', '2 1/2"', '2 1/2"', '2 3/4"', '3"', '3 1/4"', '3 1/4"', '3 1/2"', '3 3/4"', '4"', '4 1/4"', '4 1/2"', '4 3/4"', '5"', '5 1/2"', '6"'
-        ]
-        })
+        self.base_df= pd.DataFrame(
+            {
+                'class': [150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 600, 600, 600, 600, 600],
+                'diam_flange': ['1/2"', '3/4"', '1"', '1 1/4"', '1 1/2"', '2"', '2 1/2"', '3"', '4"', '6"', '8"', '10"', '12"', '14"', '16"', '18"', '20"', '24"', '1/2"', '3/4"', '1"', '1 1/4"', '1 1/2"', '2"', '2 1/2"', '3"', '4"', '6"', '8"', '10"', '12"', '14"', '16"', '18"', '20"', '24"', '4"', '6"', '8"', '10"', '12"', '14"', '16"', '18"', '20"', '24"', '1/2"', '3/4"', '1"', '1 1/4"', '1 1/2"'],
+                'quantity': [4, 4, 4, 4, 4, 4, 4, 4, 8, 8, 8, 12, 12, 12, 16, 16, 20, 20, 4, 4, 4, 4, 4, 8, 8, 8, 8, 12, 12, 16, 16, 20, 20, 24, 24, 24, 8, 12, 12, 15, 16, 20, 20, 24, 24, 24, 4, 4, 4, 4, 4],
+                'diam_screw': ['1/2"', '1/2"', '1/2"', '1/2"', '1/2"', '5/8"', '5/8"', '5/8"', '5/8"', '5/8"', '3/4"', '7/8"', '7/8"', '1"', '1"', '1 1/8"', '1 1/8"', '1 1/4"', '1/2"', '5/8"', '5/8"', '5/8"', '3/4"', '5/8"', '3/4"', '3/4"', '3/4"', '3/4"', '7/8"', '1"', '1 1/8"', '1 1/8"', '1 1/4"', '1 1/4"', '1 1/4"', '1 1/2"', '7/8"', '7/8"', '1"', '1 1/8"', '1 1/4"', '1 1/4"', '1 3/8"', '1 3/8"', '1 1/2"', '1 3/4"', '1/2"', '5/8"', '5/8"', '5/8"', '3/4"'],
+                'length': ['2"', '2 1/4"', '2 1/4"', '2 1/2"', '2 1/2"', '2 3/4"', '3"', '3 1/4"', '3 1/4"', '3 1/2"', '3 5/6"', '4"', '4 1/4"', '4 1/2"', '4 3/4"', '5"', '5 1/2"', '6"', '2"', '2 1/4"', '2 1/2"', '2 3/4"', '3"', '3"', '3 1/2"', '3 3/4"', '4"', '4 1/4"', '4 3/4"', '5 1/2"', '6"', '6 1/4"', '6 1/2"', '6 3/4"', '7 1/4"', '8"', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+            }
+        )
 
     # Método para obter todos os parafusos do dataframe
-    # def get_screws(self, DataFrame):
+    def get_screws(self, dataframe):
+        """
+        Busca os valores de quantity, diam_screw e length no base_df,
+        adicionando informações extras.
+        """
 
-        #
+        required_columns = ['Long Description (Family)', 'Spec', 'Size', 'Fixed Length']
 
-        # # Tentativa de pegar os parafusos
-        # try:
-        #     # Filtra dataframe para obter apenas a descrição que seja igual a Flange
-        #     screwsDF = DataFrame[DataFrame['Long Description (Family)'].str.startswith('FLANGE')][['Long Description (Family)', 'Size', 'Spec', 'Fixed Length']]
+        screws_df = dataframe.merge(
+            self.base_df,
+            left_on=['Pressure Class', 'Size'],
+            right_on=['class', 'diam_flange'],
+            how='left'
+        ).drop(columns=['class', 'diam_flange'])  # Remove colunas duplicadas
 
-        #     # Filtra através do banco de dados
-        #     for column in self.baseDF.columns:
-        #         # Cria um lookup em todas as colunas dos dataframe
-        #         screwsDF[column] = screwsDF['Size'].map(    
-        #             lambda x: self.baseDF[self.baseDF['diametro_nominal'] == str(x)][column].iloc[0])
+        # Criar a coluna 'Long Description (Family)' usando vetorização
+        screws_df['Long Description (Family)'] = 'PARAFUSO ' + screws_df['diam_screw'] + ' X ' + screws_df['length']
 
-        #     # Atualizar descrições e tamanhos
-        #     screwsDF['Long Description (Family)'] = screwsDF.apply(
-        #         lambda row: f"PARAFUSO {row['parafusos_diametro']} X {row['comprimento']}", axis=1)
-            
-        #     # Multiplica a quantidade de flanges pela quantidade de parafusos
-        #     screwsDF['Fixed Length'] *= screwsDF['parafusos_quantidade']
+        # Filtra o tamanho de cada
+        screws_df['Size'] = screws_df['diam_screw'] + 'x' + screws_df['length']
 
-        #     # Cria um parafuso
-        #     screwsDF['Size'] = screwsDF.apply(
-        #         lambda row: f"{row['parafusos_diametro']}x{row['comprimento']}", axis=1)
+        # Multiplicar 'Fixed Length' pela quantidade
+        screws_df['Fixed Length'] = screws_df['Fixed Length'] * screws_df['quantity']
 
-        #     # Retorna todos os parafusos
-        #     return {'status': True, 'data': screwsDF} 
+        # Filtra o meu parafuso
+        screws_df = screws_df[required_columns]
 
-        # except KeyError as err:
-        #     return {'status': False, 'error': f'KeyError relacinado à "{str(err)}" '}
-        # except Exception as err:
-        #     return {'status': False, 'error': f'Erro Inesperado: {str(err)}'}
+        ex = ExcelExtract()
+
+        screws_df = ex.sum_unique(screws_df, required_columns)
+        screws_df['Categorie'] = 'pç'
+
+        return screws_df
 
 # Classe para extração de dados do excel
 class ExcelExtract:
@@ -205,158 +201,227 @@ class ExcelExtract:
     
     # Método para concatenar diversos DataFrames
     def concat(self, *args):
+        """
+        Concatena diversos DataFrames passados como argumentos. Se algum erro ocorrer, a exceção será levantada.
+
+        Parameters:
+            *args: DataFrames que devem ser concatenados.
+
+        Returns:
+            pd.DataFrame: DataFrame concatenado e ordenado.
+
+        Raises:
+            TypeError: Se algum dos argumentos não for do tipo DataFrame.
+            Exception: Para erros inesperados durante a concatenação.
+        """
         # Verifica se os argumentos foram passados
         if not args:
-            return {'status': False, 'errror': f'Nenhum dado foi passado para concatenar: {args}'} # Retorna erro
-        
-        # For para cada argumento validando se ele é do tipo DataFrame
+            raise ValueError('Nenhum dado foi passado para concatenar.')
+
+        # Verifica se todos os argumentos são do tipo DataFrame
         for arg in args:
             if not isinstance(arg, pd.DataFrame):
-                return {'status': False, 'error': f'O argumento "{arg}" não é do tipo DataFrame'} # Retorna erro
-        
-        # Define o DataFrame geral como a concatenação dos passados
+                raise TypeError(f'O argumento "{arg}" não é do tipo DataFrame.')
+
         try:
+            # Concatena os DataFrames
             mainDF = pd.concat(args, ignore_index=True)
-            return {'status': True, 'data': mainDF.sort_values(by=['Long Description (Family)', 'Size', 'Spec'])} # Retorna dados corretamente
-        
-        # Tratamento de erros
+            # Retorna os dados ordenados
+            return mainDF.sort_values(by=['Long Description (Family)', 'Size', 'Spec'])
+
         except Exception as err:
-            return {'status': False, 'error': f'Erro Inesperado: {str(err)}'}
+            raise Exception(f'Erro inesperado: {str(err)}') from err
+
             
     # Método para somar valores únicos de cada dataframe
-    def sum_unique(self, dataframe):
-        # Tentativa de executar o programa
+    def sum_unique(self, dataframe, required_columns):
+        """
+        Agrupa os dados do DataFrame por 'Long Description (Family)', 'Size', e 'Spec',
+        e soma os valores da coluna 'Fixed Length'. Se ocorrer um erro, a exceção será levantada.
+        
+        Parameters:
+            dataframe (pd.DataFrame): O DataFrame contendo os dados.
+            
+        Returns:
+            pd.DataFrame: DataFrame agrupado e somado.
+
+        Raises:
+            ValueError: Se houver um erro entre os tipos de valores.
+            KeyError: Se houver erro de chaves (colunas) no DataFrame.
+            Exception: Para erros inesperados.
+        """
+        if 'Fixed Length' in required_columns:
+            index = required_columns.index('Fixed Length')
+            required_columns.pop(index)
+
         try:
-            # Agrupa os dados do dataframe que possuem dados semelhantes
-            mainDF = dataframe.groupby(['Long Description (Family)', 'Size', 'Spec'], as_index=False)['Fixed Length'].sum()
-            return {'status': True, 'data': mainDF} # Retorna status positivo e dados
+            # Agrupa os dados do DataFrame que possuem dados semelhantes
+            pipe_df = dataframe.groupby(required_columns, as_index=False)['Fixed Length'].sum()
+            return pipe_df  # Retorna o DataFrame agrupado e somado
 
         # Tratamento de erros
         except ValueError as err:
-            return {'status': False, 'error': f'Erro entre os tipos de valores: {str(err)}'}
+            raise ValueError(f'Erro entre os tipos de valores: {str(err)}') from err
+
         except KeyError as err:
-            return {'status': False, 'error': f'Erro de chaves da tabela: {str(err)}'}
+            raise KeyError(f'Erro de chaves da tabela: {str(err)}') from err
+
         except Exception as err:
-            return {'status': False, 'error': f'Erro Inesperado: {str(err)}'}
-        
+            raise Exception(f'Erro inesperado: {str(err)}') from err
+    
     # Método para somar valores únicos de cada dataframe
-    def count_unique(self, dataframe):
-        # Tentativa de executar o programa
+    def count_unique(self, dataframe, required_columns):
+        """
+        Agrupa os dados do DataFrame por 'Long Description (Family)', 'Size', e 'Spec',
+        e conta as ocorrências para cada grupo. Se ocorrer um erro, a exceção será levantada.
+
+        Parameters:
+            dataframe (pd.DataFrame): O DataFrame contendo os dados.
+
+        Returns:
+            pd.DataFrame: DataFrame com a contagem de ocorrências agrupadas.
+
+        Raises:
+            ValueError: Se houver um erro entre os tipos de valores.
+            KeyError: Se houver erro de chaves (colunas) no DataFrame.
+            Exception: Para erros inesperados.
+        """
         try:
-            # Agrupa os dados do dataframe que possuem dados semelhantes
-            mainDF = dataframe.groupby(['Long Description (Family)', 'Size', 'Spec']).size().reset_index(name='Fixed Length')
-            return {'status': True, 'data': mainDF} # Retorna status positivo e dados
-        
+            # Agrupa os dados e conta as ocorrências
+            mainDF = dataframe.groupby(required_columns).size().reset_index(name='Fixed Length')
+            return mainDF  # Retorna o DataFrame com a contagem
+
         # Tratamento de erros
         except ValueError as err:
-            return {'status': False, 'error': f'Erro entre os tipos de valores: {str(err)}'}
+            raise ValueError(f'Erro entre os tipos de valores: {str(err)}') from err
+
         except KeyError as err:
-            return {'status': False, 'error': f'Erro de chaves da tabela: {str(err)}'}
+            raise KeyError(f'Erro de chaves da tabela: {str(err)}') from err
+
         except Exception as err:
-            return {'status': False, 'error': f'Erro Inesperado: {str(err)}'}
+            raise Exception(f'Erro inesperado: {str(err)}') from err
+        
+    def get_flange(self, dataframe):
+        # Colunas requeridas para a planilha
+        required_columns = ['Long Description (Family)', 'Spec', 'Size', 'Pressure Class']
+
+        try:
+            # Verifica se todas as colunas solicitadas existem
+            missing_columns = [col for col in required_columns if col not in dataframe.columns]
+            if missing_columns:
+                raise KeyError(f"As seguintes colunas estão faltando: {', '.join(missing_columns)}")
+            
+            # Filtra as colunas
+            flanges_df = dataframe[required_columns]
+            flanges_df = flanges_df.dropna() # Deleta valores nulos
+
+            flanges_df = self.count_unique(flanges_df, required_columns)  # Soma e filtra os valores únicos
+            flanges_df['Categorie'] = 'pç'  # Define a unidade como metro para os dados
+            flanges_df.drop(columns=['Pressure Class']) # Elimina a classe de pressão
+
+            return flanges_df  # Retorna o DataFrame modificado
+
+        except KeyError as err:
+            raise KeyError(f'Não foi possível encontrar a chave "{str(err)}"') from err
+
+        except Exception as err:
+            raise Exception(f'Erro inesperado ocorreu: {str(err)}') from err
+        
+    def get_equipment(self, dataframe):
+
+        required_columns = ['Long Description (Family)', 'Spec', 'Size']
+
+        try:
+            # Verifica se todas as colunas solicitadas existem
+            missing_columns = [col for col in required_columns if col not in dataframe.columns]
+            if missing_columns:
+                raise KeyError(f"As seguintes colunas estão faltando: {', '.join(missing_columns)}")
+            
+            # Filtra as colunas
+            equip_df = dataframe[required_columns]
+            equip_df = equip_df.dropna() # Deleta valores nulos
+            
+            equip_df = equip_df[~equip_df['Long Description (Family)'].str.upper().str.contains(r'^(TUBO|PIPE|PARAFUSO|FLANGE)', regex=True)] # Filtra tirando as tubulações e as flanges
+
+            equip_df = self.count_unique(equip_df, required_columns)  # Soma e filtra os valores únicos
+            equip_df['Categorie'] = 'pç'  # Define a unidade como metro para os dados
+
+            return equip_df  # Retorna o DataFrame modificado
+
+        except KeyError as err:
+            raise KeyError(f'Não foi possível encontrar a chave "{str(err)}"') from err
+
+        except Exception as err:
+            raise Exception(f'Erro inesperado ocorreu: {str(err)}') from err
+
+    def get_pipe(self, dataframe):
+
+        required_columns = ['Long Description (Family)', 'Spec', 'Size', 'Fixed Length']
+
+        try:
+            # Verifica se todas as colunas solicitadas existem
+            missing_columns = [col for col in required_columns if col not in dataframe.columns]
+            if missing_columns:
+                raise KeyError(f"As seguintes colunas estão faltando: {', '.join(missing_columns)}")
+            
+            # Filtra as colunas
+            pipeDF = dataframe[required_columns]
+            pipeDF = pipeDF.dropna()
+
+            pipeDF = self.sum_unique(pipeDF, required_columns)  # Soma e filtra os valores únicos
+            pipeDF['Categorie'] = 'm'  # Define a unidade como metro para os dados
+
+            return pipeDF  # Retorna o DataFrame modificado
+
+        except KeyError as err:
+            raise KeyError(f'Não foi possível encontrar a chave "{str(err)}"') from err
+
+        except Exception as err:
+            raise Exception(f'Erro inesperado ocorreu: {str(err)}') from err
 
     # Método para ler todos os arquivos
     def read_all_files(self, files, sheet_name):
-        # Erro caso os parâmetros não sejam satisfeitos
+        """Lê múltiplos arquivos Excel e concatena os dados em um único DataFrame."""
+
+        # Validação dos parâmetros
         if not sheet_name or not files:
-            return {'status': False, 'error': 'Os parâmetros não foram fornecidos para a função "read_all_files"'}
+            raise ValueError('Os parâmetros "files" e "sheet_name" são necessários')
 
-        mainDF = pd.DataFrame() # Cria dataframe vazio
+        mainDF = pd.DataFrame()  # Cria um DataFrame vazio
+        files_not_founded = list() # Cria lista para armazenar arquivos não encontrados
 
-        # Aplica um for para cada arquivo selecionado
+        # Itera sobre a lista de arquivos
         for file in files:
             try: 
-                tempDF = pd.read_excel(file, sheet_name=sheet_name) # Lê arquivo excel na folha selecionada
-                mainDF = pd.concat([mainDF, tempDF], ignore_index=True) # Concatena o dataframe temporário com o dataframe principal
+                tempDF = pd.read_excel(file, sheet_name=sheet_name)  # Lê a aba do Excel
+                mainDF = pd.concat([mainDF, tempDF], ignore_index=True)  # Concatena os DataFrames
             
             # Tratamento de erros
-            except KeyError as err:
-                return {'status': False, 'error': f'Não foi possível encontrar a planilha desejada: "{str(err)}"'}
-            except FileNotFoundError as err:
-                return {'status': False, 'error': f'Não foi possível encontrar o arquivo: "{str(err)}"'}
-            except Exception as err:
-                return {'status': False, 'error': f'Erro Inesperado, solicite o suporte da equipe de TI: "{str(err)}"'}
+            except FileNotFoundError:
+                raise FileNotFoundError(f'O arquivo "{file}" não foi encontrado')
 
-        try:
-            # Filtra o DataFrame para calcular as tubulações
-            mainDF = mainDF[['Long Description (Family)', 'Status', 'Spec', 'Size', 'Fixed Length']]
-        
-        # Caso Fixed Length não exista dentro desse DataFrame tenta-se outra abordagem
-        except KeyError as err:
-            try: # Tentativa de criar DataFrame com as colunas especificadas
-                mainDF = mainDF[['Long Description (Family)', 'Status', 'Spec', 'Size']]
+            except PermissionError:
+                raise PermissionError(f'O arquivo "{file}" está aberto e não pode ser lido')
 
-            # Tratamento de erro para todos os casos
-            except KeyError as err:
-                return {'status': False, 'error': f'Erro ao encontrar as colunas desejadas: "{str(err)}"'}
-            except Exception as err:
-                return {'status': False, 'error': f'Erro Inesperado, solicite o suporte da equipe de TI: "{str(err)}"'}
-
-        # Filtrando o MainDF
-        try:
-            mainDF = mainDF.dropna().reset_index(drop=True) # Deleta todas as linhas que possuirem valores do tipo NaN
-            mainDF = mainDF[mainDF['Status'] == 'New'] # Filtra apenas o status new
-
-            mainDF['Spec'] = (
-                mainDF['Spec']
-                .astype(str)
-                .str.upper()
-                .str.replace(r'(^\bSPEC\b|\b0\d+)', '', regex=True)
-                .str.strip()
-                )
-
-
-        except KeyError as err:
-            return {'status': False, 'error': f'Erro ao encontrar colunas: {str(err)}'}
-        except Exception as err:
-            return {'status': False, 'error': f'Erro Inesperado, solicite o suporte da equipe de TI: "{str(err)}"'}
-
-        # Verifica se o nome da Sheet é Pipe (tubulação)
-        if 'pipe' == str(sheet_name).lower():
-            try:
-                # Somando valores únicos
-                response = self.sum_unique(mainDF)
-
-                # Verifica se o status é verdadeiro
-                if response['status']:
-                    mainDF = response['data'] # Obtem os dados 
-                    mainDF['Categorie'] = 'm' # Define a categoria como metro
-
-                    # Retorna status verdadeiro e dados
-                    return {'status': True, 'data': mainDF}
-                
-                # Retorna erro caso algum ocorra
-                return {'status': False, 'error': response['error']}
+            except ValueError:
+                files_not_founded.append(file)
+                continue
             
-            # Tratamento de erros
-            except KeyError as err:
-                return {'status': False, 'error': f'Erro de Chaves: {str(err)}'}
-            except ValueError as err:
-                return {'status': False, 'error': f'Erro de Valores: {str(err)}'}    
-            except Exception as err:
-                return {'status': False, 'error': f'Erro Inesperado, solicite o suporte da equipe de TI: {str(err)}'}
-
-        # Filtra apenas os equipamentos
-        try:
-            mainDF = mainDF[~mainDF['Long Description (Family)'].str.upper().str.contains(r'^(TUBO|PIPE|PARAFUSO|FLANGE)', regex=True)] # Filtra todos os valores exceto tubulações e flanges
-        
-            # Conta e define valores únicos
-            response = self.count_unique(mainDF)
-
-            # Verifica se o status é positivo
-            if response['status']:
-                mainDF = response['data'] # Obtem dados
-                mainDF['Categorie'] = 'pç' # Define a categoria como peça
-
-                return {'status': True, 'data': mainDF} # Retorna status positivo e dados
+        # Diz que não foi possível encontrar os arquivos
+        if len(files_not_founded) == len(files):    
+            raise ValueError(f'A planilha "{sheet_name}" não foi encontrada no(s) arquivo(s) "{files_not_founded}"')
             
-            # Retorna erro caso algum ocorra
-            return {'status': False, 'error': response['error']}
+        # Filtrando dataframe
+        try:
+            mainDF = mainDF[mainDF['Status'] == 'New'] # Filtra somente os dados novos]
+            mainDF['Spec'] = mainDF['Spec'].astype(str).str.lstrip('0').str.replace(r'(^SPEC|0)', '', regex=True)
+
+            # Retorna DataFrame
+            return mainDF
 
         # Tratamento de erros
-        except KeyError as err: 
-            return {'status': False, 'error': f'Erro de Chaves: {str(err)}'}
-        except ValueError as err:
-            return {'status': False, 'error': f'Erro de Valores: {str(err)}'}
+        except KeyError as err:
+            raise KeyError(f'A chave "{err}" não existe') from err
+        
         except Exception as err:
-            return {'status': False, 'error': f'Erro Inesperado, solicite o suporte da equipe de TI: {str(err)}'}
+            raise Exception(f'Erro inesperado ocorreu: {str(err)}') from err

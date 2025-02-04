@@ -68,8 +68,6 @@ downloadBtn.addEventListener('click', async () => {
         a.href = url;
         a.download = fileName;  // Nome do arquivo
 
-        console.log(a);
-
         document.body.appendChild(a);
         a.click();
 

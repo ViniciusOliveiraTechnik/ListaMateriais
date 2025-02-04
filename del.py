@@ -1,22 +1,5 @@
-import re
+required_columns = ['Long Description (Family)', 'Spec', 'Size', 'Fixed Length']
 
-string = """
-SPEC 02
-SPEC 16
-CS150
-ALLTECH 07
-"""
-
-pattern = r'(SPEC|0)'
-
-string = re.sub(string=string, pattern=pattern, repl='').strip()
-
-print(string)
-
-# import pandas as pd
-
-# path = r'c:\Users\Vinicius\Downloads\TUBULAÇÃO_OP02-Piping and Equipment.xlsx'
-
-# pipe = pd.read_excel(path, 'Pipe')
-
-# pipe = pipe[df['Satatus']]
+index = required_columns.index('Fixed Length')
+required_columns.pop(index)
+print(required_columns)
