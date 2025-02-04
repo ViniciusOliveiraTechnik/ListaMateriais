@@ -328,7 +328,7 @@ class ExcelExtract:
             raise Exception(f'Erro inesperado ocorreu: {str(err)}') from err
         
     def get_equipment(self, dataframe):
-
+        # Colunas requeridas para a planilha
         required_columns = ['Long Description (Family)', 'Spec', 'Size']
 
         try:
@@ -387,14 +387,13 @@ class ExcelExtract:
         if not sheet_name or not files:
             raise ValueError('Os parâmetros "files" e "sheet_name" são necessários')
 
-        mainDF = pd.DataFrame()  # Cria um DataFrame vazio
-        files_not_founded = list() # Cria lista para armazenar arquivos não encontrados
+        main_df = pd.DataFrame()  # Cria um DataFrame vazio
 
         # Itera sobre a lista de arquivos
         for file in files:
             try: 
-                tempDF = pd.read_excel(file, sheet_name=sheet_name)  # Lê a aba do Excel
-                mainDF = pd.concat([mainDF, tempDF], ignore_index=True)  # Concatena os DataFrames
+                temp_df = pd.read_excel(file, sheet_name=sheet_name)  # Lê a aba do Excel
+                main_df = pd.concat([main_df, temp_df], ignore_index=True)  # Concatena os DataFrames
             
             # Tratamento de erros
             except FileNotFoundError:
@@ -404,20 +403,15 @@ class ExcelExtract:
                 raise PermissionError(f'O arquivo "{file}" está aberto e não pode ser lido')
 
             except ValueError:
-                files_not_founded.append(file)
                 continue
-            
-        # Diz que não foi possível encontrar os arquivos
-        if len(files_not_founded) == len(files):    
-            raise ValueError(f'A planilha "{sheet_name}" não foi encontrada no(s) arquivo(s) "{files_not_founded}"')
             
         # Filtrando dataframe
         try:
-            mainDF = mainDF[mainDF['Status'] == 'New'] # Filtra somente os dados novos]
-            mainDF['Spec'] = mainDF['Spec'].astype(str).str.lstrip('0').str.replace(r'(^SPEC|0)', '', regex=True)
+            main_df = main_df[main_df['Status'] == 'New'] # Filtra somente os dados novos]
+            main_df['Spec'] = main_df['Spec'].astype(str).str.replace(r'(^SPEC|0)', '', regex=True).str.strip()
 
             # Retorna DataFrame
-            return mainDF
+            return main_df
 
         # Tratamento de erros
         except KeyError as err:

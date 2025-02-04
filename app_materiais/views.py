@@ -172,6 +172,11 @@ def upload_files(request):
 
             # Concatenando os valores
             main_df = ex.concat(pipe_df, all_flanges_df, screws_df, equip_df)
+
+            # Verifica se o dataframe é vazio
+            if main_df.empty:    
+                raise ValueError(f'Nenhum arquivo foi encontrado: "{main_df}"')
+            
             # Obtem o percentual adicional
             extra_percent = request.POST.get('percentual')
             extra_percent = float(extra_percent) / 100
