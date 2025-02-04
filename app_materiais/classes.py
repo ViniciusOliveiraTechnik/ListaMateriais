@@ -341,7 +341,7 @@ class ExcelExtract:
             equip_df = dataframe[required_columns]
             equip_df = equip_df.dropna() # Deleta valores nulos
             
-            equip_df = equip_df[~equip_df['Long Description (Family)'].str.upper().str.contains(r'^(TUBO|PIPE|PARAFUSO|FLANGE)', regex=True)] # Filtra tirando as tubulações e as flanges
+            equip_df = equip_df[~equip_df['Long Description (Family)'].str.upper().str.contains(r'^(TUBO|PIPE|PARAF|BOLT|FLANGE)', regex=True)] # Filtra tirando as tubulações e as flanges
 
             equip_df = self.count_unique(equip_df, required_columns)  # Soma e filtra os valores únicos
             equip_df['Categorie'] = 'pç'  # Define a unidade como metro para os dados

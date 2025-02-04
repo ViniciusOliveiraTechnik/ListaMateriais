@@ -152,20 +152,26 @@ def upload_files(request):
             # Filtra as colunas de tubulação
             pipe_df = ex.read_all_files(files, 'Pipe')
             pipe_df = ex.get_pipe(pipe_df)
-            print(pipe_df)
+
             # Filtrando as flanges
             flanges_df = ex.read_all_files(files, 'Flange')
-            flanges_df = ex.get_flange(flanges_df)
+            blind_flanges_df = ex.read_all_files(files, 'Blind Flange')
+
+            # Concatenando Flanges
+            all_flanges_df = ex.concat(flanges_df, blind_flanges_df)
+            
+            # Obtendo flanges
+            all_flanges_df = ex.get_flange(all_flanges_df)
 
             # Filtrando parafusos
-            screws_df = screws.get_screws(flanges_df)
+            screws_df = screws.get_screws(all_flanges_df)
 
             # Filtrando os equipamentos
             equip_df = ex.read_all_files(files, 'Piping and Equipment')
             equip_df = ex.get_equipment(equip_df)
 
             # Concatenando os valores
-            main_df = ex.concat(pipe_df, flanges_df, screws_df, equip_df)
+            main_df = ex.concat(pipe_df, all_flanges_df, screws_df, equip_df)
             # Obtem o percentual adicional
             extra_percent = request.POST.get('percentual')
             extra_percent = float(extra_percent) / 100
