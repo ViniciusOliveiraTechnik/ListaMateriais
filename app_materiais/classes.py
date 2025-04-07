@@ -393,6 +393,7 @@ class ExcelExtract:
         for file in files:
             try: 
                 temp_df = pd.read_excel(file, sheet_name=sheet_name)  # Lê a aba do Excel
+                print(file, sheet_name)
                 main_df = pd.concat([main_df, temp_df], ignore_index=True)  # Concatena os DataFrames
             
             # Tratamento de erros
@@ -415,7 +416,7 @@ class ExcelExtract:
 
         # Tratamento de erros
         except KeyError as err:
-            raise KeyError(f'A chave "{err}" não existe') from err
+            raise KeyError(f'A chave "{err}" não existe na {file}, {sheet_name}') from err
         
         except Exception as err:
             raise Exception(f'Erro inesperado ocorreu: {str(err)}') from err
