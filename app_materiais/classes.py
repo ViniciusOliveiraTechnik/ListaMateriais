@@ -380,43 +380,41 @@ class ExcelExtract:
             raise Exception(f'Erro inesperado ocorreu: {str(err)}') from err
 
     # Método para ler todos os arquivos
-    def read_all_files(self, files, sheet_name):
-        """Lê múltiplos arquivos Excel e concatena os dados em um único DataFrame."""
-
-        # Validação dos parâmetros
-        if not sheet_name or not files:
-            raise ValueError('Os parâmetros "files" e "sheet_name" são necessários')
-
-        main_df = pd.DataFrame()  # Cria um DataFrame vazio
-
-        # Itera sobre a lista de arquivos
-        for file in files:
-            try: 
-                temp_df = pd.read_excel(file, sheet_name=sheet_name)  # Lê a aba do Excel
-                print(file, sheet_name)
-                main_df = pd.concat([main_df, temp_df], ignore_index=True)  # Concatena os DataFrames
-            
-            # Tratamento de erros
-            except FileNotFoundError:
-                raise FileNotFoundError(f'O arquivo "{file}" não foi encontrado')
-
-            except PermissionError:
-                raise PermissionError(f'O arquivo "{file}" está aberto e não pode ser lido')
-
-            except ValueError:
-                continue
-            
-        # Filtrando dataframe
-        try:
-            main_df = main_df[main_df['Status'] == 'New'] # Filtra somente os dados novos]
-            main_df['Spec'] = main_df['Spec'].astype(str).str.replace(r'(^SPEC|0)', '', regex=True).str.strip()
-
-            # Retorna DataFrame
-            return main_df
-
-        # Tratamento de erros
-        except KeyError as err:
-            raise KeyError(f'A chave "{err}" não existe na {file}, {sheet_name}') from err
+    def read_all_files(self, files: list, sheet_name: str) -> pd.DataFrame:
+        """
+        Reads many files passed by the caller and saves them to a dataframe
+        """
         
-        except Exception as err:
-            raise Exception(f'Erro inesperado ocorreu: {str(err)}') from err
+        if not files or not sheet_name:
+            raise ValueError('Os parâmetros "files" e "sheet_name" são necessários')
+        
+        dfs = [] # Array to saves dataframes
+
+        # Iterate to each file
+        for file in files:
+            
+            # try to read the file using the sheet_name param
+            try:
+                temp_df = pd.read_excel(file, sheet_name=sheet_name)
+
+                # Verify data content
+                if not temp_df.empty:
+
+                    # Try to filter only new lines
+                    try:
+                        temp_df = temp_df[temp_df['Status'].str.lower() == 'new']
+                        temp_df['Spec'] = temp_df['Spec'].astype(str).str.replace(r'(^SPEC|0)', '', regex=True).str.strip()
+                    except KeyError as err:
+                        raise KeyError(f'Não foi possível encontrar o campo {str(err)} no arquivo: "{file}", folha: "{sheet_name}"') from err
+
+                    # Add the dataframe to the main data
+                    dfs.append(temp_df)
+                    
+            except ValueError:           
+                continue # Skip the step if dataframe doesn't contains the sheet_name
+            except PermissionError:
+                raise PermissionError(f'Não é possível ler o arquivo "{file}" pois está aberto')
+            except Exception as err:
+                raise err
+
+        return pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
